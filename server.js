@@ -3,6 +3,13 @@ var cors = require("cors");
 var app = express();
 var path = require("path");
 
+require("dotenv").config({ path: "./config.env" }); 
+const { MongoClient } = require("mongodb"); 
+const uri = process.env.MONGODB_PREFIX + process.env.MONGODB_USERNAME + ":" + 
+process.env.MONGODB_PASSWORD + process.env.MONGODB_URL; 
+const client = new MongoClient(uri); 
+const db = client.db("LessonsDB");
+
 app.use(express.json());
 app.use(cors());
 
@@ -17,36 +24,10 @@ app.listen(3000, function () {
 });
 
 
-app.get("/lessons", function (request, response) {
-    response.json([
-        {
-            Subject: "Computer Science",
-            Id: 2005,
-            Location: "Hendon",
-            Price: 60,
-            Availability: 5,
-            Image: "cs.img.jpg",
-            ImageAlt: "Computer Science"
-        },
-        {
-            Subject: "Maths",
-            Id: 2006,
-            Location: "Hendon",
-            Price: 55,
-            Availability: 7,
-            Image: "math.webp",
-            ImageAlt: "Maths"
-        },
-        {
-            Subject: "English",
-            Id: 2007,
-            Location: "Hendon",
-            Price: 50,
-            Availability: 5,
-            Image: "english.webp",
-            ImageAlt: "English"
-        }
-    ]);
+app.get("/lessons", async function (request, response) {
+   let collection = await db.collection("Lessons");
+   let results = await collection.find({}).toArray();
+   response.send(results);
 });
 
 var publicPath = path.resolve(__dirname, "images");
