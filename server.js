@@ -2,6 +2,8 @@ var express = require("express");
 var cors = require("cors");
 var app = express();
 var path = require("path");
+const port = process.env.PORT || 3000;
+
 
 require("dotenv").config({ path: "./config.env" }); 
 const { MongoClient, ObjectId } = require("mongodb"); 
@@ -19,8 +21,8 @@ app.use(function (request, response, next) {
     next();
 });
 
-app.listen(3000, function () {
-    console.log("App started on port 3000");
+app.listen(port, function () {
+    console.log("App started on port " + port);
 });
 
 
