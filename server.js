@@ -4,7 +4,7 @@ var app = express();
 var path = require("path");
 
 require("dotenv").config({ path: "./config.env" }); 
-const { MongoClient } = require("mongodb"); 
+const { MongoClient, ObjectId } = require("mongodb"); 
 const uri = process.env.MONGODB_PREFIX + process.env.MONGODB_USERNAME + ":" + 
 process.env.MONGODB_PASSWORD + process.env.MONGODB_URL; 
 const client = new MongoClient(uri); 
@@ -38,7 +38,7 @@ app.use("/images", function (request, response) {
     response.status(404).send("images not found");
 });
 
-app.post("/orders", function (request, response) {
+app.post("/orders", async function (request, response) {
     var order = request.body;
     console.log("New Order received: " 
         + "\nCustomer: " + order.name 
@@ -56,7 +56,28 @@ app.post("/orders", function (request, response) {
         );
         console.log();
     });
-    response.json({message: "Order received!"});
+
+    let collection = await db.collection("Orders");
+    let result = await collection.insertOne(order);
+    response.send(result);
+});
+
+app.put("/lessons/:_id" , async function(request, response) {
+
+    var body = request.body;
+    let collection = await db.collection("Lessons");
+    let tempid = request.params._id;
+
+    const query = { 
+        _id: new ObjectId(tempid)
+    };
+    const updates = {
+        $set: request.body
+    };
+    result = await collection.updateOne(query, updates);
+    response.send(result);
+    console.log(result);
+    
 });
 
 app.use(function (request, response, next) {
